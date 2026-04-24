@@ -15,15 +15,15 @@ n_tokens = len(tokens)
 
 # 初始注意力权重
 np.random.seed(42)
-weights = np.random.dirichlet(np.ones(n_tokens), size=n_tokens)
+weights = np.random.dirichlet(np.ones(n_tokens)*0.7, size=n_tokens)
 
 # 动画时间轴定义 (单位: 帧) - 扩充为5个阶段
-frames_per_token = 90
+frames_per_token = 70
 phase1_duration = n_tokens * frames_per_token  # 阶段1: 注意力计算
-phase2_duration = 120                          # 阶段2: 消除间隔汇聚
-phase3_duration = 60                           # 阶段3: 画括号展示
-phase4_duration = 90                           # 阶段4: 整体上移，旧词元消失
-phase5_duration = 100                          # 阶段5: 重新展开，变为新输入
+phase2_duration = 50                          # 阶段2: 消除间隔汇聚
+phase3_duration = 30                           # 阶段3: 画括号展示
+phase4_duration = 30                           # 阶段4: 整体上移，旧词元消失
+phase5_duration = 30                          # 阶段5: 重新展开，变为新输入
 total_cycle_frames = phase1_duration + phase2_duration + phase3_duration + phase4_duration + phase5_duration
 
 # 递归状态变量
@@ -45,7 +45,7 @@ def step_into_next_layer():
     tokens = list(output_numbers)
     depth += 1
     generate_new_numbers()
-    weights = np.random.dirichlet(np.ones(n_tokens), size=n_tokens)
+    weights = np.random.dirichlet(np.ones(n_tokens)*0.7, size=n_tokens)
 
 def draw():
     global output_numbers, depth
