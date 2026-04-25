@@ -1,31 +1,31 @@
 import os
 
-# 1. 在导入 py5 之前，配置 Java 环境
+# 1. Configure Java environment BEFORE importing py5
 java_home_path = r"C:\Users\admin\anaconda3\envs\Processing\Library\lib\jvm"
 os.environ["JAVA_HOME"] = java_home_path
 
-# 2. 导入依赖
+# 2. Import dependencies
 import py5
 import numpy as np
 
 # ==========================================
-# 分辨率与缩放配置区
+# Resolution and scaling configuration
 # ==========================================
-TARGET_WIDTH = 1920  # 【这里手动输入你想要的导出宽度】
-TARGET_HEIGHT = 1080 # 【这里手动输入你想要的导出高度】
+TARGET_WIDTH = 1920  # [Enter your desired export width here]
+TARGET_HEIGHT = 1080 # [Enter your desired export height here]
 
-BASE_WIDTH = 900     # 原始逻辑宽度 (请勿修改)
-BASE_HEIGHT = 500    # 原始逻辑高度 (请勿修改)
+BASE_WIDTH = 900     # Original logical width (do not modify)
+BASE_HEIGHT = 500    # Original logical height (do not modify)
 
-# 初始序列定义
+# Initial sequence definition
 tokens = ["The", "cat", "sat", "on", "the", "mat"]
 n_tokens = len(tokens)
 
-# 初始注意力权重
+# Initial attention weights
 np.random.seed(42)
 weights = np.random.dirichlet(np.ones(n_tokens)*0.7, size=n_tokens)
 
-# 动画时间轴定义 (单位: 帧) - 扩充为5个阶段
+# Animation timeline definition (unit: frames) - expanded to 5 phases
 frames_per_token = 70
 phase1_duration = n_tokens * frames_per_token  
 phase2_duration = 50                           
@@ -34,12 +34,12 @@ phase4_duration = 30
 phase5_duration = 30                           
 total_cycle_frames = phase1_duration + phase2_duration + phase3_duration + phase4_duration + phase5_duration
 
-# 递归状态变量
+# Recursive state variables
 output_numbers = []
 depth = 0  
 
 def setup():
-    # 使用你手动输入的目标物理分辨率
+    # Use your manually specified target physical resolution
     py5.size(TARGET_WIDTH, TARGET_HEIGHT)
     py5.frame_rate(30)
     py5.text_align(py5.CENTER, py5.CENTER)
@@ -63,27 +63,27 @@ def draw():
     py5.background(25)
     
     # ==========================================
-    # 核心新增逻辑：计算等比缩放与居中
+    # Core logic: calculate proportional scaling and centering
     # ==========================================
-    # 取宽高中较小的缩放比例，保证内容不被裁切且等比放大
+    # Use the smaller scaling ratio to ensure content is not cropped and scales proportionally
     scale_factor = min(TARGET_WIDTH / BASE_WIDTH, TARGET_HEIGHT / BASE_HEIGHT)
     
-    # 计算需要平移的距离，使逻辑画布在物理窗口中居中
+    # Calculate translation distance to center the logical canvas in the physical window
     offset_x = (TARGET_WIDTH - BASE_WIDTH * scale_factor) / 2
     offset_y = (TARGET_HEIGHT - BASE_HEIGHT * scale_factor) / 2
     
-    # 应用矩阵变换
+    # Apply matrix transformation
     py5.translate(offset_x, offset_y)
     py5.scale(scale_factor)
     # ------------------------------------------
     
     cycle_frame = py5.frame_count % total_cycle_frames
     
-    # 动画周期完全结束时，在后台切换数据状态（保留原有的无限循环机制）
+    # When animation cycle completes, switch data state in background (preserve infinite loop mechanism)
     if cycle_frame == 0 and py5.frame_count > 0:
         step_into_next_layer()
         
-    # 布局计算参数 (注意：这里的 py5.width/height 被替换为了 BASE_WIDTH/BASE_HEIGHT)
+    # Layout calculation parameters (note: py5.width/height replaced with BASE_WIDTH/BASE_HEIGHT)
     margin = 100
     spacing = (BASE_WIDTH - 2 * margin) / (n_tokens - 1)
     y_tokens = BASE_HEIGHT / 2 - 20
@@ -103,7 +103,7 @@ def draw():
     t4 = t3 + phase4_duration
 
     # ==========================================
-    # 阶段 1: 注意力连线与随机数生成
+    # Phase 1: Attention lines and random number generation
     # ==========================================
     if cycle_frame < t1:
         current_idx = cycle_frame // frames_per_token
@@ -132,7 +132,7 @@ def draw():
                 py5.text(output_numbers[i], x, y_numbers)
 
     # ==========================================
-    # 阶段 2: 消除间隔汇聚 
+    # Phase 2: Eliminate spacing and converge
     # ==========================================
     elif cycle_frame < t2:
         progress = (cycle_frame - t1) / phase2_duration
@@ -153,7 +153,7 @@ def draw():
             py5.text(output_numbers[i], current_x, y_numbers)
 
     # ==========================================
-    # 阶段 3: 画括号保持展示
+    # Phase 3: Draw brackets and display
     # ==========================================
     elif cycle_frame < t3:
         for i, token in enumerate(tokens):
@@ -176,7 +176,7 @@ def draw():
         py5.text("]", start_target_x + total_shrink_width + 30, y_numbers - 5)
 
     # ==========================================
-    # 阶段 4: 整体上移，同时旧词元和括号淡出
+    # Phase 4: Move up, fade out old tokens and brackets
     # ==========================================
     elif cycle_frame < t4:
         progress = (cycle_frame - t3) / phase4_duration
@@ -203,7 +203,7 @@ def draw():
         py5.text("]", start_target_x + total_shrink_width + 30, current_y - 5)
 
     # ==========================================
-    # 阶段 5: 重新展开，颜色渐变为默认输入态
+    # Phase 5: Re-expand, color gradient to default input state
     # ==========================================
     else:
         progress = (cycle_frame - t4) / phase5_duration
@@ -214,9 +214,9 @@ def draw():
         c_b = py5.lerp(150, 120, progress)
         
         for i, token in enumerate(tokens):
-            orig_x = margin + i * spacing
-            target_x = start_target_x + i * num_spacing
-            current_x = py5.lerp(target_x, orig_x, ease_p)
+            orig_x = start_target_x + i * num_spacing
+            target_x = margin + i * spacing
+            current_x = py5.lerp(orig_x, target_x, ease_p)
             
             py5.fill(c_r, c_g, c_b)
             t_size = py5.lerp(24, 20, progress)
@@ -224,9 +224,9 @@ def draw():
             py5.text(output_numbers[i], current_x, y_tokens)
 
     # ==========================================
-    # 导出机制设定 (无限制连续导出)
+    # Export mechanism (unlimited continuous export)
     # ==========================================
-    # 导出的图片文件尺寸会自动匹配你设置的 TARGET_WIDTH 和 TARGET_HEIGHT
+    # Exported image dimensions will automatically match your TARGET_WIDTH and TARGET_HEIGHT settings
     py5.save_frame("frames/frame_####.png")
 
 def draw_attention_lines(current_source_idx, local_frame, margin, spacing, y_pos):
