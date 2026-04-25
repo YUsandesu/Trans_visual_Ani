@@ -60,7 +60,7 @@ def step_into_next_layer():
 def draw():
     global output_numbers, depth
     
-    py5.background(25)
+    py5.background(255)
     
     # ==========================================
     # 核心新增逻辑：计算等比缩放与居中
@@ -93,7 +93,7 @@ def draw():
     total_shrink_width = (n_tokens - 1) * num_spacing
     start_target_x = BASE_WIDTH / 2 - total_shrink_width / 2
 
-    py5.fill(100)
+    py5.fill(0)
     py5.text_size(16)
     py5.text(f"Transformer Layer Depth: {depth}", BASE_WIDTH / 2, 30)
 
@@ -117,17 +117,17 @@ def draw():
                 py5.fill(255, 215, 0)
                 py5.text_size(32)
             else:
-                py5.fill(120)
+                py5.fill(0)
                 py5.text_size(20)
             py5.text(token, x, y_tokens)
             
             if i < current_idx:
-                py5.fill(150, 255, 150)
+                py5.fill(0, 150, 0)
                 py5.text_size(24)
                 py5.text(output_numbers[i], x, y_numbers)
             elif i == current_idx:
                 alpha = py5.remap(local_frame, frames_per_token * 0.6, frames_per_token, 0, 255)
-                py5.fill(150, 255, 150, py5.constrain(alpha, 0, 255))
+                py5.fill(0, 150, 0, py5.constrain(alpha, 0, 255))
                 py5.text_size(24)
                 py5.text(output_numbers[i], x, y_numbers)
 
@@ -140,7 +140,7 @@ def draw():
         
         for i, token in enumerate(tokens):
             x = margin + i * spacing
-            py5.fill(80)
+            py5.fill(0)
             py5.text_size(20)
             py5.text(token, x, y_tokens)
             
@@ -148,7 +148,7 @@ def draw():
             target_x = start_target_x + i * num_spacing
             current_x = py5.lerp(orig_x, target_x, ease_p)
             
-            py5.fill(150, 255, 150)
+            py5.fill(0, 150, 0)
             py5.text_size(24)
             py5.text(output_numbers[i], current_x, y_numbers)
 
@@ -158,19 +158,19 @@ def draw():
     elif cycle_frame < t3:
         for i, token in enumerate(tokens):
             x = margin + i * spacing
-            py5.fill(80)
+            py5.fill(0)
             py5.text_size(20)
             py5.text(token, x, y_tokens)
             
             target_x = start_target_x + i * num_spacing
-            py5.fill(150, 255, 150)
+            py5.fill(0, 150, 0)
             py5.text_size(24)
             py5.text(output_numbers[i], target_x, y_numbers)
             
         bracket_progress = (cycle_frame - t2) / (phase3_duration * 0.5)
         bracket_alpha = py5.constrain(bracket_progress * 255, 0, 255)
         
-        py5.fill(255, bracket_alpha)
+        py5.fill(0, bracket_alpha)
         py5.text_size(48)
         py5.text("[", start_target_x - 30, y_numbers - 5) 
         py5.text("]", start_target_x + total_shrink_width + 30, y_numbers - 5)
@@ -188,16 +188,16 @@ def draw():
         
         for i, token in enumerate(tokens):
             x = margin + i * spacing
-            py5.fill(80, old_token_alpha)
+            py5.fill(0, old_token_alpha)
             py5.text_size(20)
             py5.text(token, x, y_tokens)
             
             target_x = start_target_x + i * num_spacing
-            py5.fill(150, 255, 150)
+            py5.fill(0, 150, 0)
             py5.text_size(24)
             py5.text(output_numbers[i], target_x, current_y)
             
-        py5.fill(255, bracket_alpha)
+        py5.fill(0, bracket_alpha)
         py5.text_size(48)
         py5.text("[", start_target_x - 30, current_y - 5) 
         py5.text("]", start_target_x + total_shrink_width + 30, current_y - 5)
@@ -209,9 +209,9 @@ def draw():
         progress = (cycle_frame - t4) / phase5_duration
         ease_p = -(py5.cos(py5.PI * progress) - 1) / 2
         
-        c_r = py5.lerp(150, 120, progress)
-        c_g = py5.lerp(255, 120, progress)
-        c_b = py5.lerp(150, 120, progress)
+        c_r = py5.lerp(0, 0, progress)
+        c_g = py5.lerp(150, 0, progress)
+        c_b = py5.lerp(0, 0, progress)
         
         for i, token in enumerate(tokens):
             orig_x = margin + i * spacing
@@ -247,7 +247,7 @@ def draw_attention_lines(current_source_idx, local_frame, margin, spacing, y_pos
         weight = weights[current_source_idx][i]
         alpha = py5.remap(weight, 0, 1, 50, 255)
         
-        py5.stroke(0, 200, 255, alpha)
+        py5.stroke(0, 100, 200, alpha)
         py5.stroke_weight(py5.remap(weight, 0, 1, 1, 5))
         py5.no_fill()
 
